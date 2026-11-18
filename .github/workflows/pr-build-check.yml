@@ -46,6 +46,10 @@ jobs:
           - wio_wm1110_repeater
           # SX1276 (ESP32)
           - Tbeam_SX1276_repeater
+          # QwickMesh portable companion candidates (LilyGO)
+          - Tbeam_SX1276_companion_radio_ble
+          - Tbeam_SX1262_companion_radio_ble
+          - LilyGo_TDeck_companion_radio_ble
 
     steps:
       - name: Clone Repo
