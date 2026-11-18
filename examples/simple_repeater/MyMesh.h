@@ -35,6 +35,7 @@
 #include <helpers/TxtDataHelpers.h>
 #include <helpers/RegionMap.h>
 #include <helpers/RoutingPolicy.h>
+#include <helpers/QwickMeshForwardLimiter.h>
 #include "RateLimiter.h"
 
 #ifdef WITH_BRIDGE
@@ -96,6 +97,7 @@ class MyMesh : public mesh::Mesh, public CommonCLICallbacks {
   RegionEntry* recv_pkt_region;
   TransportKey default_scope;
   RateLimiter discover_limiter, anon_limiter;
+  mesh::QwickMeshForwardLimiter qwickmesh_forward_limiter;
   uint32_t pending_discover_tag;
   unsigned long pending_discover_until;
   bool region_load_active;
@@ -133,6 +135,7 @@ protected:
   }
 
   bool allowPacketForward(const mesh::Packet* packet) override;
+  bool shouldRouteRawCustom(const mesh::Packet* packet) override;
   const char* getLogDateTime() override;
   void logRxRaw(float snr, float rssi, const uint8_t raw[], int len) override;
 

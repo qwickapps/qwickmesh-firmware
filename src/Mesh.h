@@ -142,8 +142,14 @@ protected:
 
   /**
    * \brief  A packet with PAYLOAD_TYPE_RAW_CUSTOM has been received.
-  */
+   */
   virtual void onRawDataRecv(Packet* packet) { }
+
+  /**
+   * \brief  Opt in to flood-routing a recognized RAW_CUSTOM protocol. The default
+   * is deny so existing custom payloads retain their direct-only behavior.
+   */
+  virtual bool shouldRouteRawCustom(const Packet* packet) { return false; }
 
   /**
    * \brief  Perform search of local DB of matching GroupChannels.
