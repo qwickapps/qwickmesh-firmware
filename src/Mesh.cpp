@@ -290,10 +290,11 @@ DispatcherAction Mesh::onRecvPacket(Packet* pkt) {
       break;
     }
     case PAYLOAD_TYPE_RAW_CUSTOM: {
-      if (pkt->isRouteDirect() && !_tables->wasSeen(pkt)) {
+      if (!_tables->wasSeen(pkt)
+          && (pkt->isRouteDirect() || (pkt->isRouteFlood() && shouldRouteRawCustom(pkt)))) {
         _tables->markSeen(pkt);
         onRawDataRecv(pkt);
-        //action = routeRecvPacket(pkt);    don't flood route these (yet)
+        if (pkt->isRouteFlood()) action = routeRecvPacket(pkt);
       }
       break;
     }

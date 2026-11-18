@@ -433,6 +433,12 @@ void MyMesh::sendFloodReply(mesh::Packet* packet, unsigned long delay_millis, ui
 
 bool MyMesh::allowPacketForward(const mesh::Packet *packet) {
   if (_prefs.disable_fwd) return false;
+
+  const bool is_qwickmesh = mesh::isQwickMeshCarrier(packet);
+  if (is_qwickmesh && packet->isRouteFlood()
+      && packet->getPathHashCount() >= mesh::QWICKMESH_MAX_FLOOD_HOPS) {
+    return false;
+  }
   if (packet->isRouteFlood()
       && mesh::isFloodHopLimitExceeded(packet, _prefs.flood_max, _prefs.flood_max_unscoped, _prefs.flood_max_advert)) {
     return false;
@@ -455,7 +461,17 @@ bool MyMesh::allowPacketForward(const mesh::Packet *packet) {
       return false;
     }
   }
+  if (is_qwickmesh && packet->isRouteFlood()
+      && !qwickmesh_forward_limiter.allow(mesh::qwickMeshSourceKey(packet), _ms->getMillis(),
+                                           _radio->getEstAirtimeFor(packet->getRawLength()))) {
+    MESH_DEBUG_PRINTLN("allowPacketForward: QwickMesh source airtime budget exhausted");
+    return false;
+  }
   return true;
+}
+
+bool MyMesh::shouldRouteRawCustom(const mesh::Packet* packet) {
+  return mesh::isQwickMeshCarrier(packet);
 }
 
 const char *MyMesh::getLogDateTime() {
